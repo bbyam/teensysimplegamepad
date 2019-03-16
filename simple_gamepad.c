@@ -43,9 +43,14 @@
 
 #define CPU_PRESCALE(n) (CLKPR = 0x80, CLKPR = (n))
 
+// Number of 1 ms sleeps until state is automatically transmitted when there has been no change
+#define NOCHANGE_TX_COUNT   33  // Approx 30 per second
+
 
 int main(void)
 {
+    uint8_t noChangeCounter = 0;
+
     // set for 16 MHz clock
     CPU_PRESCALE(0);
 
@@ -65,10 +70,31 @@ int main(void)
     // and do whatever it does to actually be ready for input
     _delay_ms(1000);
 
+    // Initialize and transmit initial state
+    simple_gampad_read_buttons();
+    usb_simple_gamepad_send();
+
     for (;;)
     {
-        simple_gampad_read_buttons();
-        usb_simple_gamepad_send();
+        if (simple_gampad_read_buttons())
+        {
+            // Send if state changed or if the host requested descriptors
+            // The time this send takes will work as simple debounce
+            usb_simple_gamepad_send();
+            noChangeCounter = 0;
+        }
+        else
+        {
+            // Brief sleep otherwise
+            _delay_ms(1);
+
+            // Continue to transmit state every so often when there's no change
+            if (++noChangeCounter >= NOCHANGE_TX_COUNT)
+            {
+                usb_simple_gamepad_send();
+                noChangeCounter = 0;
+            }
+        }
     }
 }
 

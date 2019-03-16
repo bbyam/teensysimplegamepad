@@ -43,6 +43,7 @@
 
 #include "simple_gamepad_defs.h"
 #include "simple_gamepad_usb.h"
+#include <string.h>
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
@@ -184,13 +185,17 @@ READ_ALL_INPUTS(uint8_t portArray[5])
 
 
 /* this function reads the gamepad state from the hardware */
-void
+uint8_t
 simple_gampad_read_buttons(void)
 {
     uint8_t inPorts[5];
     uint8_t i;
     uint8_t btnArrayIndex;
     uint8_t btnArrayShift;
+    gamepad_state prevState;
+
+    // save previous state
+    prevState = g_gamepadState;
 
     // read all values from hardware into local array
     READ_ALL_INPUTS(inPorts);
@@ -226,6 +231,8 @@ simple_gampad_read_buttons(void)
         g_gamepadState.buttons[btnArrayIndex] |=
                 INPUT_ACTIVE(inPorts, BUTTON_BTN[i][0], BUTTON_BTN[i][1]) << btnArrayShift;
     }
+
+    return (memcmp(&g_gamepadState, &prevState, sizeof(prevState)) == 0 ? 0 : 1);
 }
 
 
@@ -261,8 +268,8 @@ usb_simple_gamepad_send(void)
     }
 
     // transmit axis
-    UEDATX = g_gamepadState.x_axis;
-    UEDATX = g_gamepadState.y_axis;
+    UEDATX = (uint8_t)g_gamepadState.x_axis;
+    UEDATX = (uint8_t)g_gamepadState.y_axis;
     // transmit each button
     for (i = 0; i < BUTTON_ARRAY_SIZE; i++)
     {

@@ -52,12 +52,12 @@
 /* this function configures the hardware for the desired usage */
 void simple_gamepad_configure(void);
 /* this function reads the gamepad state from the hardware */
-void simple_gampad_read_buttons(void);
+uint8_t simple_gampad_read_buttons(void);
 /* this function transmits the state report */
 int8_t usb_simple_gamepad_send(void);
 
 
-/* button array, 1 bit for each button */
+/* button array byte size, 1 bit for each button */
 #define BUTTON_ARRAY_SIZE ((BUTTON_COUNT + 7) / 8)
 
 typedef struct
@@ -74,11 +74,11 @@ typedef struct
 extern gamepad_state g_gamepadState;
 
 // these are used to set the axis values
-#define AXIS_CENTER     ((uint8_t)0x80)
-#define X_AXIS_LEFT     ((uint8_t)0x00)
-#define X_AXIS_RIGHT    ((uint8_t)0xFF)
-#define Y_AXIS_UP       ((uint8_t)0x00)
-#define Y_AXIS_DOWN     ((uint8_t)0xFF)
+#define AXIS_CENTER     ((uint8_t)0x00)
+#define X_AXIS_LEFT     ((uint8_t)0x81) // -127
+#define X_AXIS_RIGHT    ((uint8_t)0x7F) // 127
+#define Y_AXIS_UP       ((uint8_t)0x81) // -127
+#define Y_AXIS_DOWN     ((uint8_t)0x7F) // 127
 
 
 #if (BUTTON_COUNT % 8) == 0
@@ -95,10 +95,10 @@ static const uint8_t PROGMEM gamepad_hid_report_desc[] = {
     0xa1, 0x00,         //   COLLECTION (Physical)
     0x09, 0x30,         //     USAGE (X)
     0x09, 0x31,         //     USAGE (Y)
-    0x15, 0x00,         //     LOGICAL_MINIMUM (0)
-    0x26, 0xff, 0x00,   //     LOGICAL_MAXIMUM (255)
-    0x95, 0x02,         //     REPORT_COUNT (2)
+    0x15, 0x81,         //     LOGICAL_MINIMUM (-127)
+    0x25, 0x7f,         //     LOGICAL_MAXIMUM (127)
     0x75, 0x08,         //     REPORT_SIZE (8)
+    0x95, 0x02,         //     REPORT_COUNT (2)
     0x81, 0x02,         //     INPUT (Data,Var,Abs)
     0x05, 0x09,         //     USAGE_PAGE (Button)
     0x19, 0x01,         //     USAGE_MINIMUM (Button 1)
