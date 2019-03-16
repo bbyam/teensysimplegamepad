@@ -24,3 +24,6 @@ USB Reference: http://www.beyondlogic.org/usbnutshell/usb5.shtml
 ## Links
 
 This code is open source, can be used for any purpose, and requires no attribution to me other than in the MIT license. However, I would love to hear how you have used my code in your project! Also, if you would like me to link to a project of yours derived from this one, just let me know.
+
+2 Gamepads in one Teensy device for a Neo Geo Adapter:  
+https://github.com/sylverb/NeoGeoUSBAdapter
