@@ -1,5 +1,4 @@
-# teensysimplegamepad
-Teensy 2.0 Simple Gamepad
+# Teensy 2.0 Simple Gamepad
 
 The Teensy 2.0 Simple Gamepad implements a simple USB gamepad with up/down/left/right and a configurable number of buttons (between 1 and 20). It is designed to run on the Teensy 2.0 board.
 
